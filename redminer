@@ -31,7 +31,7 @@ class Projects < Redmine; end
 class Issues < Redmine; end
 
 def badarg(path, c)
-		msg = "redmine: bad #{path.join(' ')} command"
+		msg = "redminer: bad #{path.join(' ')} command"
 		msg << "\nexpected:\n#{c.to_yaml}"
 		$stderr.puts msg
 		exit 1
