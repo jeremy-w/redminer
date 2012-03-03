@@ -1,0 +1,136 @@
+#!/usr/bin/env ruby
+# Author:: Jeremy W. Sherman
+# Copyright:: 2012 Jeremy W. Sherman
+# License:: 3-clause BSD (see LICENSE for its full glory)
+#--
+# vi: set noet ts=4 sw=4 :
+#++
+#
+# Redminer is a commandline interface to the Redmine API.
+# See README.markdown for more.
+
+require './net_item'
+require 'rubygems'
+require 'active_resource'
+require 'yaml'
+
+@rsrcClasses = [:TimeEntry]
+ACTIVITY_DEV = 2
+
+$R = NetItem.new('redmine')
+
+class Redmine < ActiveResource::Base
+		self.site = 'http://' + $R.server
+		self.user = $R.account
+		self.password = $R.password
+end
+
+class TimeEntry < Redmine; end
+class Users < Redmine; end
+class Projects < Redmine; end
+class Issues < Redmine; end
+
+def badarg(path, c)
+		msg = "redmine: bad #{path.join(' ')} command"
+		msg << "\nexpected:\n#{c.to_yaml}"
+		$stderr.puts msg
+		exit 1
+end
+
+def sec2hr(s)
+	seconds = s.to_f
+	minutes = seconds / 60.0
+	hours = minutes / 60.0
+	# Round seconds up to the half-hour.
+	whole = hours.truncate.to_f
+	frac = hours - whole
+	hours = frac >= 0.5 ? whole + 1.0 : frac > 0 ? whole + 0.5 : whole
+end
+
+def time_entries_get(page = 1)
+	params = {:page => page}
+	entries = TimeEntry.find(:all, :params => params)
+end
+
+def time_entries_mine()
+	u = user()
+	uid = u[:id]
+	mine = []
+	n = 1
+	begin
+		es = time_entries_get(n)
+		if es.size > 0
+			mine.concat(es.select {|e| e.user.id == uid})
+		end
+		n += 1
+	end until mine.size > 5
+	mine
+end
+
+def time_post(spent_on, hours, issue_id)
+	hours = hours.to_f
+	issue = Issues.find(issue_id)
+	if not issue then
+		return "error: issue #{issue_id} not found"
+	end
+	puts "#{spent_on}: #{issue.subject} (#{issue.project.name}): #{hours} h"
+	#return 'DEMO'  # bail when just testing the formatting
+	entry = TimeEntries.create(
+		{ :issue_id => issue_id,
+		  :spent_on => spent_on,
+		  :hours => hours,
+		  :activity_id => 2 })
+	return entry
+end
+
+def user()
+	Users.get(:current)
+end
+
+def projects_get(page = 1)
+	params = {:page => page}
+	entries = Projects.find(:all, :params => params)
+end
+
+def issues_get(page = 1)
+	params = {:page => page}
+	entries = Issues.find(:all, :params => params)
+end
+
+def issues_id(id)
+	issue = Issues.find(id)
+end
+
+commands = {
+	:time =>
+		{ :get => :time_entries_get,
+		  :mine => :time_entries_mine,
+		  :post => :time_post},
+	:user => :user,
+	:projects => :projects_get,
+	:issues =>
+		{ :get => :issues_get,
+		  :id => :issues_id, },
+}
+
+path = []
+c = commands
+ARGV.each do |arg|
+	argsym = arg.to_sym
+	if c.kind_of? Symbol
+		break
+	elsif c.include? argsym
+		path << arg.to_s
+		c = c[argsym]
+	else
+		badarg(path, c)
+	end
+end
+
+if not c.kind_of? Symbol
+	badarg(path, c)
+end
+
+#puts "using args #{ARGV[path.size..ARGV.size]}"
+puts self.send(c, *ARGV[path.size..ARGV.size]).to_yaml
+0
