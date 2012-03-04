@@ -9,12 +9,13 @@
 # Redminer is a commandline interface to the Redmine API.
 # See README.markdown for more.
 
-require './net_item'
+parent_dir = File.dirname(File.realpath(__FILE__))
+$LOAD_PATH.unshift File.join(parent_dir, *%w[.. lib])
+require 'net_item'
 require 'rubygems'
 require 'active_resource'
 require 'yaml'
 
-@rsrcClasses = [:TimeEntry]
 ACTIVITY_DEV = 2
 
 $R = NetItem.new('redmine')
