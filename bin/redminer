@@ -76,7 +76,7 @@ def time_post(spent_on, hours, issue_id)
 	end
 	puts "#{spent_on}: #{issue.subject} (#{issue.project.name}): #{hours} h"
 	#return 'DEMO'  # bail when just testing the formatting
-	entry = TimeEntries.create(
+	entry = TimeEntry.create(
 		{ :issue_id => issue_id,
 		  :spent_on => spent_on,
 		  :hours => hours,
