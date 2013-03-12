@@ -27,8 +27,15 @@ class NetItem
 		m = /^\s+"acct"<blob>="(.*)"\s*$/.match(blob)
 		@account = check(m, "account", missing)
 
+		m = /^\s+"ptcl"<uint32>="(.*)"\s*$/.match(blob)
+		fourchar = check(m, "protocol", missing)
+		protocol = fourchar == "htps" ? "https://" : "http://"
+
 		m = /^\s+"srvr"<blob>="(.*)"\s*$/.match(blob)
-		@server = check(m, "server", missing)
+		host = check(m, "server", missing)
+		if host
+			@server = protocol + host
+		end
 
 		m = /^password: "(.*)"$/.match(blob)
 		@password = check(m, "password", missing)

@@ -21,7 +21,7 @@ ACTIVITY_DEV = 2
 $R = NetItem.new('redmine')
 
 class Redmine < ActiveResource::Base
-		self.site = 'http://' + $R.server
+		self.site = $R.server
 		self.user = $R.account
 		self.password = $R.password
 end
