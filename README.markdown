@@ -30,6 +30,25 @@ Redminer depends on the OS X keychain for storage of your login info,
 and on your sufferance for its continued existence.
 It begs a thousand pardons that it should be so ugly and yet live.
 
+## Setup
+Add a new Internet password named "redmine" with the correct host.
+Add "api: &lt;yourkey&gt;" to the comments field.
+
+Using Keychain.app:
+
+- Choose File > New Password, or just hit Cmd-N.
+  - First field is the web address of your Redmine host (include the http:// or
+    https:// part).
+  - Second field is your Redmine username.
+  - Third field is your Redmine account password.
+  - Now add the password entry to the Keychain using the button in the lower
+    right.
+
+- Now double-click to edit the password:
+  - Change the name to just "redmine".
+  - In the Comments field, put "api: 1234…abcd", replacing the part after
+    "api: " with your API key.
+
 ## Todo
 * Non-fugly user interface. (YAML hash dump? Really?)
 * An actual user interface supporting flags and some flexibility,
