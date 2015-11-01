@@ -1,5 +1,7 @@
 # Redminer
 
+**⚠️ NOTE: Redminer is unmaintained. PRs are welcome, but I won't be hacking on this myself any time soon.**
+
 ## What
 Redminer is a commandline interface to the Redmine API.
 The Redmine API is limited in scope, and so is this tool.
